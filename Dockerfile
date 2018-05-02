@@ -1,21 +1,21 @@
-# Pull da imagem
-FROM dockerfile/ubuntu
+FROM node:carbon
 
-# Instalando Java.
-RUN \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  add-apt-repository -y ppa:webupd8team/java && \
-  apt-get update && \
-  apt-get install -y oracle-java8-installer && \
-  rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk8-installer
+# Criar diretorio da apliação
+WORKDIR /usr/src/app
 
+# Instalar as dependências da aplicação
+# O wildcard '*' é assegurado para garantir que amobs os  package.json e package-lock.json sejam copiados.
+COPY package*.json ./
 
-# Define o diretorio de trabalho.
-WORKDIR /data
+RUN npm install
+# Se voce for buildar seu codigo em Produção
+# RUN npm install --only=production
 
-# Define a variacel JAVA_HOME.
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# Copie sua aplicação para dentro da imagem
+COPY . .
 
-# Define o comando default.
-CMD ["bash"]
+# Expondo as portas
+EXPOSE 8080
+
+# Iniciando aplicação com node server.js
+CMD [ "npm", "start" ]
